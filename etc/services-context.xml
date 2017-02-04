@@ -1,0 +1,174 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.0.xsd">
+
+	<bean id="volatilityAlgorithm" class="com.russipoteka.moexintegration.domain.VolatilityAlgorithm">
+		<constructor-arg ref="candleRepository" />
+		<constructor-arg>
+			<list>
+				<ref bean="volatilityRuleGreen" />
+				<ref bean="volatilityRuleYellow" />
+				<ref bean="volatilityRuleRed" />
+				<ref bean="volatilityRuleBlack" />
+			</list>
+		</constructor-arg>
+		<property name="depth" value="5" />
+		<property name="sessionTime" ref="localTime" />
+	</bean>
+	
+	<bean id="flatVolatilityAlgorithm" class="com.russipoteka.moexintegration.domain.FlatVolatilityAlgorithm">
+		<constructor-arg ref="candleRepository" />
+		<constructor-arg>
+			<list>
+				<ref bean="volatilityRuleGreen" />
+				<ref bean="volatilityRuleYellow" />
+				<ref bean="volatilityRuleRed" />
+				<ref bean="volatilityRuleBlack" />
+			</list>
+		</constructor-arg>
+		<property name="thresholdMinutes" value="10" />
+		<property name="sessionTime" ref="localTime" />
+	</bean>
+
+	<bean id="localTime" class="org.joda.time.LocalTime">
+		<constructor-arg value="9" />
+		<constructor-arg value="0" />
+		<constructor-arg value="0" />
+	</bean>
+
+	<bean id="volatilityRuleGreen" class="com.russipoteka.moexintegration.domain.VolatilityRule">
+		<property name="sessionRange">
+			<bean class="com.russipoteka.moexintegration.domain.VolatilityRange">
+				<property name="minVolatility" value="0.00" />
+				<property name="maxVolatility" value="0.01" />
+			</bean>
+		</property>
+		<property name="currentRange">
+			<bean class="com.russipoteka.moexintegration.domain.VolatilityRange">
+				<property name="minVolatility" value="0.00" />
+				<property name="maxVolatility" value="0.005" />
+			</bean>
+		</property>
+		<property name="volatilityLevel" value="GREEN" />
+	</bean>
+
+	<bean id="volatilityRuleYellow" class="com.russipoteka.moexintegration.domain.VolatilityRule">
+		<property name="sessionRange">
+			<bean class="com.russipoteka.moexintegration.domain.VolatilityRange">
+				<property name="minVolatility" value="0.01" />
+				<property name="maxVolatility" value="0.03" />
+			</bean>
+		</property>
+		<property name="currentRange">
+			<bean class="com.russipoteka.moexintegration.domain.VolatilityRange">
+				<property name="minVolatility" value="0.005" />
+				<property name="maxVolatility" value="0.015" />
+			</bean>
+		</property>
+		<property name="volatilityLevel" value="YELLOW" />
+	</bean>
+
+	<bean id="volatilityRuleRed" class="com.russipoteka.moexintegration.domain.VolatilityRule">
+		<property name="sessionRange">
+			<bean class="com.russipoteka.moexintegration.domain.VolatilityRange">
+				<property name="minVolatility" value="0.03" />
+				<property name="maxVolatility" value="0.05" />
+			</bean>
+		</property>
+		<property name="currentRange">
+			<bean class="com.russipoteka.moexintegration.domain.VolatilityRange">
+				<property name="minVolatility" value="0.015" />
+				<property name="maxVolatility" value="0.03" />
+			</bean>
+		</property>
+		<property name="volatilityLevel" value="RED" />
+	</bean>
+
+	<bean id="volatilityRuleBlack" class="com.russipoteka.moexintegration.domain.VolatilityRule">
+		<property name="sessionRange">
+			<bean class="com.russipoteka.moexintegration.domain.VolatilityRange">
+				<property name="minVolatility" value="0.05" />
+				<property name="maxVolatility" value="1.00" />
+			</bean>
+		</property>
+		<property name="currentRange">
+			<bean class="com.russipoteka.moexintegration.domain.VolatilityRange">
+				<property name="minVolatility" value="0.03" />
+				<property name="maxVolatility" value="1.00" />
+			</bean>
+		</property>
+		<property name="volatilityLevel" value="BLACK" />
+	</bean>
+	
+	<bean id="volatilityService"
+		class="com.russipoteka.moexintegration.domain.DefaultVolatilityService">
+		<constructor-arg>
+			<list>
+				<ref bean="volatilityAlgorithm" />
+				<ref bean="flatVolatilityAlgorithm" />
+			</list>
+		</constructor-arg>
+	</bean>
+	
+	<bean id="rateAlgorithm" class="com.russipoteka.moexintegration.domain.RateAlgorithm">
+		<constructor-arg ref="volatilityRepository" />
+		<constructor-arg ref="candleRepository" />
+		<property name="sellRates">
+			<map>
+				<entry key="GREEN" value="0.015" />
+				<entry key="YELLOW" value="0.03" />
+				<entry key="RED" value="0.07" />
+				<entry key="BLACK" value="0.07" />
+			</map>
+		</property>
+		<property name="buyRates">
+			<map>
+				<entry key="GREEN" value="0.015" />
+				<entry key="YELLOW" value="0.03" />
+				<entry key="RED" value="0.07" />
+				<entry key="BLACK" value="0.07" />
+			</map>
+		</property>
+	</bean>
+	<bean id="flatRateAlgorithm" class="com.russipoteka.moexintegration.domain.FlatRateAlgorithm">
+		<constructor-arg ref="volatilityRepository" />
+		<constructor-arg ref="candleRepository" />
+		<property name="sellRates">
+			<map>
+				<entry key="GREEN" value="0.015" />
+				<entry key="YELLOW" value="0.03" />
+				<entry key="RED" value="0.07" />
+				<entry key="BLACK" value="0.07" />
+			</map>
+		</property>
+		<property name="buyRates">
+			<map>
+				<entry key="GREEN" value="0.015" />
+				<entry key="YELLOW" value="0.03" />
+				<entry key="RED" value="0.07" />
+				<entry key="BLACK" value="0.07" />
+			</map>
+		</property>
+	</bean>
+	
+	<bean id="rateService" class="com.russipoteka.moexintegration.domain.DefaultRateService">
+		<constructor-arg>
+			<list>
+				<ref bean="rateAlgorithm" />
+				<ref bean="flatRateAlgorithm" />
+			</list>
+		</constructor-arg>
+	</bean>
+
+	<bean id="candleListener" class="com.russipoteka.moexintegration.domain.DefaultCandlePersistedListener">
+		<constructor-arg ref="rateService" />
+		<constructor-arg ref="volatilityService" />
+	</bean>
+	
+	<bean id="rateResource" class="com.russipoteka.moexintegration.services.RateResource" />
+	<bean id="orderResource" class="com.russipoteka.moexintegration.services.OrderResource" />
+	<bean id="volatilityResource" class="com.russipoteka.moexintegration.services.VolatilityResource" />
+	<bean id="healthCheckResource" class="com.russipoteka.moexintegration.services.HealthCheckResource" />
+</beans>

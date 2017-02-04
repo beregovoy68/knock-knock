@@ -45,16 +45,14 @@ public class TriangleTypeTest extends AbstractWebServiceTest {
 	public void testParameterMissing() throws Exception {
 		createSpec(3, 4, null)
 			.assertThat()
-				.statusCode(404)
-				.body("message", startsWith("No HTTP resource was found"));
+				.statusCode(404);
 	}
 	
 	@Test
 	public void testNoParameters() throws Exception {
 		createSpec(null, null, null)
 			.assertThat()
-				.statusCode(404)
-				.body("message", startsWith("No HTTP resource was found"));
+				.statusCode(404);
 	}
 	
 	@Test

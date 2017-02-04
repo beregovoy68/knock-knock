@@ -1,6 +1,7 @@
 package net.readify.knockknock;
 
 import static org.hamcrest.Matchers.equalTo;
+import static org.junit.Assert.*;
 
 import org.junit.Test;
 
@@ -17,10 +18,21 @@ public class FibonacciMethodTest extends AbstractWebServiceTest {
 	}
 	
 	@Test
+	public void testIntMax() throws Exception {
+		createSpec(Integer.toString(Integer.MAX_VALUE))
+			.statusCode(400);
+	}
+	
+	@Test
+	public void testLongOverflow() throws Exception {
+		createSpec("93")
+			.statusCode(400);
+	}
+	
+	@Test
 	public void testBadArgument() throws Exception {
 		createSpec("asdfag")
-			.statusCode(400)
-			.body("message", equalTo("The request is invalid."));
+			.statusCode(400);
 	}
 	
 	@Test

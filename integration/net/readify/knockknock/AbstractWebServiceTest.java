@@ -12,7 +12,8 @@ public abstract class AbstractWebServiceTest {
 	
 	@BeforeClass
 	public static void setUpSuite() {
-		RestAssured.baseURI = "https://knockknock.readify.net:443";
+		//RestAssured.baseURI = "https://knockknock.readify.net:443";
+		RestAssured.baseURI = "http://localhost:8090";
 		RestAssured.basePath = "/api";
 	}
 	
