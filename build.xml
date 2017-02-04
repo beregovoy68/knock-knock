@@ -1,0 +1,277 @@
+<project name="moex-integration-service" basedir="." default="jar-distr" xmlns:ivy="antlib:org.apache.ivy.ant"
+         xmlns:cs="antlib:com.puppycrawl.tools.checkstyle.ant">
+
+    <property file="global.properties"/>
+
+    <condition property="ant.executable" value="ant">
+        <os family="unix"/>
+    </condition>
+
+    <condition property="ant.executable" value="ant.bat">
+        <os family="windows"/>
+    </condition>
+
+    <target name="/nocheck" description="Use this option to skip various checks">
+        <property name="option.skipchecks" value="true"/>
+    </target>
+
+    <target name="/notest" description="Use this option to skip tests">
+        <property name="option.skiptest" value="true"/>
+    </target>
+
+    <target name="/noresolve" description="Use this option to skip ivy resolve">
+        <property name="option.noresolve" value="true"/>
+    </target>
+
+    <target name="set-test-environment">
+        <property name="environment" value="test"/>
+        <property name="lib-type" value="embeded"/>
+    </target>
+
+    <target name="set-local-properties" depends="set-test-environment"/>
+
+    <target name="get-publish-configuration">
+        <condition property="option.release" value="true">
+            <equals arg1="${publish.status}" arg2="release"/>
+        </condition>
+    </target>
+
+    <target name="set-configuration-development" depends="get-publish-configuration">
+        <property name="ivy.conf" value="development"/>
+        <property name="retrieve.pattern" value="${lib}/[artifact]-[revision](-[classifier]).[ext]"/>
+    </target>
+
+    <target name="ivy-load" depends="set-configuration-development"
+            unless="option.noresolve">
+        <path id="ivy.lib.path">
+            <pathelement location="${etc.build}/ivy.jar"/>
+            <pathelement location="${etc.build}/jsch.jar"/>
+        </path>
+        <taskdef resource="org/apache/ivy/ant/antlib.xml" uri="antlib:org.apache.ivy.ant" classpathref="ivy.lib.path"/>
+    </target>
+
+    <target name="ivy-init" depends="ivy-load" unless="option.noresolve">
+        <ivy:settings file="${etc.ivysettings}/ivysettings.xml"/>
+        <ivy:resolve conf="${ivy.conf}"/>
+    </target>
+
+    <target name="clean-lib" unless="option.noresolve" description="Removes lib directory">
+        <echo message="Cleaning lib directory"/>
+        <delete dir="${lib}" includeEmptyDirs="true"/>
+    </target>
+
+    <target name="clean" depends="clean-lib" description="Removes all temporary directories">
+        <delete dir="${bin}" includeEmptyDirs="true"/>
+        <delete dir="${build}" includeEmptyDirs="true"/>
+        <delete dir="${distr}" includeEmptyDirs="true"/>
+        <delete dir="${generated}" includeEmptyDirs="true"/>
+    </target>
+
+    <target name="retrieve" depends="ivy-init, clean" unless="option.noresolve">
+        <mkdir dir="${lib}"/>
+        <ivy:retrieve pattern="${retrieve.pattern}"/>
+    </target>
+
+    <target name="lib" depends="retrieve" description="Retrieves all external libraries and files"/>
+
+    <target name="init-classpath" depends="retrieve">
+        <path id="lib.classpath">
+            <fileset dir="${lib}">
+                <include name="*.jar"/>
+            </fileset>
+            <fileset dir="${etc}/lib">
+                <include name="*.jar"/>
+            </fileset>
+        </path>
+        <path id="run.classpath">
+            <pathelement location="${project.classes.build}"/>
+            <path refid="lib.classpath"/>
+        </path>
+        <path id="test.classpath">
+            <fileset dir="${lib}">
+                <include name="*.jar"/>
+            </fileset>
+            <pathelement location="${project.classes.build}"/>
+            <pathelement path="${test.build}"/>
+        </path>
+    </target>
+
+    <target name="prepare" depends="init-classpath">
+        <mkdir dir="${bin}"/>
+        <mkdir dir="${classes.build}"/>
+        <mkdir dir="${project.classes.build}"/>
+        <mkdir dir="${test.build}"/>
+        <mkdir dir="${integration.build}"/>
+        <mkdir dir="${artifacts.build}"/>
+        <mkdir dir="${javadoc.build}"/>
+        <mkdir dir="${docker.build}"/>
+    </target>
+
+    <target name="compile" depends="prepare">
+        <javac destdir="${project.classes.build}" classpathref="lib.classpath" sourcepath=""
+               source="${minimum.javaversion}" target="${minimum.javaversion}" debug="${debug.mode}" encoding="UTF-8"
+               includeantruntime="no">
+            <src path="${src}"/>
+        </javac>
+        <copy todir="${project.classes.build}" includeEmptyDirs="false">
+            <fileset dir="${src}">
+                <exclude name="**/*.java"/>
+            </fileset>
+        </copy>
+    </target>
+
+    <target name="init-test" depends="prepare">
+        <fileset id="test.fileset" dir="${test}">
+            <include name="**/${test.class.pattern}.java"/>
+            <exclude name="**/Abstract${test.class.pattern}.java"/>
+            <exclude name="**/Base${test.class.pattern}.java"/>
+            <exclude name="**/TestUtils.java"/>
+        </fileset>
+        <copy todir="${test.build}">
+            <fileset dir="${etc}/test">
+                <include name="*.xml"/>
+                <include name="*.properties"/>
+            </fileset>
+            <fileset dir="${etc}/mappings">
+                <include name="*.xml"/>
+            </fileset>
+            <fileset dir="${etc}">
+                <include name="*.xml"/>
+            </fileset>
+        </copy>
+    </target>
+
+    <target name="compile-test" depends="compile">
+        <javac srcdir="${test}"
+               destdir="${test.build}"
+               classpathref="run.classpath"
+               source="${minimum.javaversion}"
+               target="${minimum.javaversion}"
+               debug="${debug.mode}"
+               encoding="UTF-8"
+               includeantruntime="no"/>
+        <copy todir="${test.build}">
+            <fileset dir="${test}">
+                <exclude name="**/*.java"/>
+            </fileset>
+        </copy>
+    </target>
+
+    <target name="run-test" depends="init-test, compile-test" unless="option.skiptest">
+        <mkdir dir="${test.xml}"/>
+
+        <junit
+                haltonfailure="off"
+                haltonerror="off"
+                errorproperty="test.failed"
+                failureproperty="test.failed"
+                showoutput="no"
+                printsummary="yes"
+                includeantruntime="yes"
+                dir="${test.build}"
+                fork="true">
+            <classpath>
+                <path refid="test.classpath"/>
+            </classpath>
+            <formatter type="xml"/>
+            <batchtest todir="${test.xml}">
+                <fileset refid="test.fileset"/>
+            </batchtest>
+        </junit>
+    </target>
+
+    <target name="test" depends="run-test" unless="option.skiptest" description="Run unit tests">
+        <fail if="test.failed"
+              message="At least one test has failed. See logs (in ${test.xml}) for details (use the target test-report to run the test with a report)"/>
+    </target>
+
+    <target name="test-report" depends="run-test" unless="option.skiptest" description="Run the test with report">
+        <junitreport todir="${test.xml}">
+            <fileset dir="${test.xml}">
+                <include name="TEST-*.xml"/>
+            </fileset>
+            <report format="noframes" todir="${reports}">
+            </report>
+        </junitreport>
+        <fail if="test.failed"
+              message="At least one test has failed. See logs (in ${test.xml}) or report (in ${reports})"/>
+    </target>
+
+    <target name="create-jar" depends="compile, test-report, set-local-properties">
+        <echo message="version=${module.version}${line.separator}" file="${project.classes.build}/module.properties"
+              append="true"/>
+        <echo message="date=${pubdate}${line.separator}" file="${project.classes.build}/module.properties"
+              append="true"/>
+
+        <mkdir dir="${jars}"/>
+
+        <copy todir="${jars}/lib">
+            <fileset dir="${lib}">
+                <include name="*.jar"/>
+                <exclude name="*sources*"/>
+                <exclude name="*javadoc*"/>
+                <exclude name="cucumber*"/>
+                <exclude name="junit*"/>
+                <exclude name="rest-assured*"/>
+                <exclude name="selenium*"/>
+                <exclude name="mockito*"/>
+            </fileset>
+            <fileset dir="${etc}/lib">
+                <include name="*.jar"/>
+            </fileset>
+        </copy>
+
+        <fileset dir="${jars}/lib" id="lib.jars">
+            <include name="*.jar"/>
+        </fileset>
+
+        <pathconvert property="mf.classpath" pathsep=" " targetos="unix" refid="lib.jars">
+            <map from="${jars}/lib" to="./lib"/>
+        </pathconvert>
+
+        <copy file="${etc}/manifest.mf" todir="${build}">
+            <filterchain>
+                <expandproperties/>
+            </filterchain>
+        </copy>
+
+        <jar destfile="${jars}/${service.name}.${service.ext}" manifest="${build}/manifest.mf">
+            <fileset dir="${project.classes.build}"/>
+        </jar>
+
+        <delete file="${project.classes.build}/module.properties"/>
+
+        <copy todir="${jars}">
+            <fileset dir="${etc}/release">
+                <include name="*.xml"/>
+                <include name="*.properties"/>
+            </fileset>
+            <fileset dir="${etc}">
+                <include name="*.xml"/>
+            </fileset>
+        </copy>
+    </target>
+
+    <target name="jar" depends="create-jar" description="Create JAR file"/>
+
+    <target name="jar-distr" depends="jar" description="Creates zip with the jar and libriries">
+        <mkdir dir="${distr}/service"/>
+
+        <copy todir="${distr}/service" includeEmptyDirs="false">
+            <fileset dir="${jars}">
+                <include name="*"/>
+            </fileset>
+        </copy>
+        <copy todir="${distr}/service/lib" includeEmptyDirs="false">
+            <fileset dir="${jars}/lib">
+                <include name="*.jar"/>
+            </fileset>
+            <fileset dir="${etc}/lib">
+                <include name="*.jar"/>
+            </fileset>
+        </copy>
+        <zip destfile="${distr}/${service.name}-${version}.zip">
+            <fileset dir="${distr}/service/"/>
+        </zip>
+    </target>
+</project>

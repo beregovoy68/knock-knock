@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<ivysettings>
+	<settings defaultResolver="chain"/>
+	<statuses default="development">
+		<status name="release" integration="false"/>
+		<status name="integration" integration="true"/>
+		<status name="development" integration="true"/>
+	</statuses>
+	<resolvers>
+		<chain name="chain">
+			<ibiblio name="central" m2compatible="true"/>
+			<filesystem name="local">
+				<ivy pattern="${user.home}/.local-ivy-repository/[organisation]/[module]/[revision]/ivy.xml"/>
+				<artifact pattern="${user.home}/.local-ivy-repository/[organisation]/[module]/[revision]/[artifact]-[revision].[ext]"/>
+			</filesystem>
+		</chain>
+	</resolvers>
+</ivysettings>
