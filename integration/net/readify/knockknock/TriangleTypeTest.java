@@ -1,7 +1,5 @@
 package net.readify.knockknock;
 
-import static org.hamcrest.Matchers.startsWith;
-
 import org.junit.Test;
 
 import io.restassured.response.ValidatableResponse;
