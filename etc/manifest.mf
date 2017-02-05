@@ -1,0 +1,7 @@
+Specification-Title: Knock Knock Service
+Specification-Version: ${version}
+Implementation-Title: net.readify.knockknock
+Implementation-Version: ${version}
+Extension-name: net.readify.knockknock
+Class-Path: ${mf.classpath} .
+Main-Class: net.readify.knockknock.Application

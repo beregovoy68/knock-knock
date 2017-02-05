@@ -40,7 +40,7 @@ public class KnockKnockResource {
 			throw new ClientErrorException(Status.BAD_REQUEST);
 		}
 		catch (IllegalArgumentException ex) {
-			// should be BAD_REQUEST, but the reference service responds this
+			// should be BAD_REQUEST, but the reference service responds like this
 			throw new NotFoundException(ex.getMessage());
 		}
 	}
@@ -68,13 +68,13 @@ public class KnockKnockResource {
 			ensureArgumentNotNull(lengthA, "a");
 			ensureArgumentNotNull(lengthB, "b");
 			ensureArgumentNotNull(lengthC, "c");
-			
-			return postProcessString(service.triangleType(lengthA, lengthB, lengthC).toString());
 		}
 		catch (IllegalArgumentException ex) {
-			// should be BAD_REQUEST, but the reference service responds this
+			// should be BAD_REQUEST, but the reference service responds like this
 			throw new NotFoundException(ex.getMessage());
 		}
+		
+		return postProcessString(service.triangleType(lengthA, lengthB, lengthC).toString());
 	}
 	
 	private static void ensureArgumentNotNull(Object value, String name) {

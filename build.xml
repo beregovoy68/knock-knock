@@ -79,9 +79,6 @@
             <fileset dir="${lib}">
                 <include name="*.jar"/>
             </fileset>
-            <fileset dir="${etc}/lib">
-                <include name="*.jar"/>
-            </fileset>
         </path>
         <path id="run.classpath">
             <pathelement location="${project.classes.build}"/>
@@ -103,8 +100,6 @@
         <mkdir dir="${test.build}"/>
         <mkdir dir="${integration.build}"/>
         <mkdir dir="${artifacts.build}"/>
-        <mkdir dir="${javadoc.build}"/>
-        <mkdir dir="${docker.build}"/>
     </target>
 
     <target name="compile" depends="prepare">
@@ -125,16 +120,8 @@
             <include name="**/${test.class.pattern}.java"/>
             <exclude name="**/Abstract${test.class.pattern}.java"/>
             <exclude name="**/Base${test.class.pattern}.java"/>
-            <exclude name="**/TestUtils.java"/>
         </fileset>
         <copy todir="${test.build}">
-            <fileset dir="${etc}/test">
-                <include name="*.xml"/>
-                <include name="*.properties"/>
-            </fileset>
-            <fileset dir="${etc}/mappings">
-                <include name="*.xml"/>
-            </fileset>
             <fileset dir="${etc}">
                 <include name="*.xml"/>
             </fileset>
@@ -215,9 +202,8 @@
                 <exclude name="rest-assured*"/>
                 <exclude name="selenium*"/>
                 <exclude name="mockito*"/>
-            </fileset>
-            <fileset dir="${etc}/lib">
-                <include name="*.jar"/>
+            	<exclude name="lucene*"/>
+            	<exclude name="hamcrest*"/>
             </fileset>
         </copy>
 
@@ -242,10 +228,6 @@
         <delete file="${project.classes.build}/module.properties"/>
 
         <copy todir="${jars}">
-            <fileset dir="${etc}/release">
-                <include name="*.xml"/>
-                <include name="*.properties"/>
-            </fileset>
             <fileset dir="${etc}">
                 <include name="*.xml"/>
             </fileset>
@@ -264,9 +246,6 @@
         </copy>
         <copy todir="${distr}/service/lib" includeEmptyDirs="false">
             <fileset dir="${jars}/lib">
-                <include name="*.jar"/>
-            </fileset>
-            <fileset dir="${etc}/lib">
                 <include name="*.jar"/>
             </fileset>
         </copy>

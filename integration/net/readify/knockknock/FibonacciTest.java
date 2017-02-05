@@ -8,7 +8,7 @@ import org.junit.Test;
 import io.restassured.response.ValidatableResponse;
 import io.restassured.specification.RequestSpecification;
 
-public class FibonacciMethodTest extends AbstractWebServiceTest {
+public class FibonacciTest extends AbstractWebServiceTest {
 	
 	@Test
 	public void testSuccessStory() throws Exception {

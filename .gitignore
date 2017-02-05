@@ -1,7 +1,10 @@
 *.class
-*.log
+*log.txt
 
 bin/
+build/
+distr/
+lib/
 
 # Mobile Tools for Java (J2ME)
 .mtj.tmp/

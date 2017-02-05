@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE ivy-module [
     <!ENTITY cxf.version "3.1.9">
-    <!ENTITY jackson.version "2.5.4">
     <!ENTITY spring.version "4.3.6.RELEASE">
 ]>
 <ivy-module version="2.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://ant.apache.org/ivy/schemas/ivy.xsd">
@@ -21,11 +20,6 @@
 		<dependency org="org.apache.cxf" name="cxf-rt-transports-http" rev="&cxf.version;"/>
 		<dependency org="org.apache.cxf" name="cxf-rt-transports-http-jetty" rev="&cxf.version;"/>
 		<dependency org="org.apache.cxf" name="cxf-rt-rs-extension-providers" rev="&cxf.version;"/>
-		<dependency org="org.apache.cxf" name="cxf-tools-wsdlto-core" rev="&cxf.version;"/>
-		<dependency org="org.apache.cxf" name="cxf-tools-wsdlto-databinding-jaxb" rev="&cxf.version;"/>
-		<dependency org="org.apache.cxf" name="cxf-tools-wsdlto-frontend-jaxws" rev="&cxf.version;"/>
-		<dependency org="com.fasterxml.jackson.jaxrs" name="jackson-jaxrs-json-provider" rev="&jackson.version;"/>
-		<dependency org="com.fasterxml.jackson.datatype" name="jackson-datatype-joda" rev="&jackson.version;"/>
 		<dependency org="org.springframework" name="spring-core" rev="&spring.version;"/>
 		<dependency org="org.springframework" name="spring-context" rev="&spring.version;"/>
 		<dependency org="org.springframework" name="spring-context-support" rev="&spring.version;"/>

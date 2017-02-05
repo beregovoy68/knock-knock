@@ -6,13 +6,16 @@ import org.springframework.stereotype.Service;
 
 @Service
 public class DefaultKnockKnockService implements KnockKnockService {
+	
+	private static final int MIN_FIBONACCI_INDEX_THAT_CAUSE_OVERFLOW = 93;
 
 	@Override
 	public long fibonacciNumber(int sequenceNumber) throws LongOverflowException {
 		if (sequenceNumber < 0)
 			throw new IllegalArgumentException("sequence number can not be negative");
 		
-		if (sequenceNumber >= 93)
+		// detecting long overflow to make things simpler 
+		if (sequenceNumber >= MIN_FIBONACCI_INDEX_THAT_CAUSE_OVERFLOW)
 			throw new LongOverflowException("sequenceNumber is too big");
 		
 		long a = 0;

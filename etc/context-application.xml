@@ -4,9 +4,13 @@
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xmlns="http://www.springframework.org/schema/beans"
 	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:cxf="http://cxf.apache.org/core"
+	xmlns:jaxrs="http://cxf.apache.org/jaxrs"
 	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
  http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.0.xsd
- http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-3.0.xsd">
+ http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-3.0.xsd
+ http://cxf.apache.org/core http://cxf.apache.org/schemas/core.xsd
+ http://cxf.apache.org/jaxrs http://cxf.apache.org/schemas/jaxrs.xsd">
 
 	<!-- This will automatically locate any and all property files you have 
 		within your classpath. The located property files are parsed and their values 
@@ -15,4 +19,13 @@
 	<context:component-scan base-package="net.readify.knockknock" />
 	
 	<bean id="resource" class="net.readify.knockknock.KnockKnockResource" />
+	
+	<jaxrs:server id="server" address="http://localhost:8090/">
+	    <jaxrs:serviceBeans>
+	      <bean class="net.readify.knockknock.KnockKnockResource" />
+	    </jaxrs:serviceBeans>
+	    <jaxrs:features>
+     		<cxf:logging/>
+		</jaxrs:features>
+	</jaxrs:server>
 </beans>

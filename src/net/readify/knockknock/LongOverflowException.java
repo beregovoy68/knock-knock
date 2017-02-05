@@ -7,5 +7,4 @@ public class LongOverflowException extends Exception {
 	public LongOverflowException(String message) {
 		super(message);
 	}
-
 }
