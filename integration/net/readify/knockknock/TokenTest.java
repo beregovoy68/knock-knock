@@ -12,7 +12,7 @@ public class TokenTest extends AbstractWebServiceTest {
 	public void testOk() throws Exception {
 		super.given()
 		.when()
-			.get("/Token")
+			.get("/token")
 		.then()
 			.assertThat()
 				.statusCode(200)

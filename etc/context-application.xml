@@ -17,15 +17,13 @@
 		can then be used within application context files in the form of ${propertyKey}. -->
 	<context:property-placeholder location="classpath*:*.properties" />
 	<context:component-scan base-package="net.readify.knockknock" />
-	
-	<bean id="resource" class="net.readify.knockknock.KnockKnockResource" />
-	
+
 	<jaxrs:server id="server" address="http://localhost:8090/">
-	    <jaxrs:serviceBeans>
-	      <bean class="net.readify.knockknock.KnockKnockResource" />
-	    </jaxrs:serviceBeans>
-	    <jaxrs:features>
-     		<cxf:logging/>
+		<jaxrs:serviceBeans>
+			<bean class="net.readify.knockknock.KnockKnockResource" />
+		</jaxrs:serviceBeans>
+		<jaxrs:features>
+			<cxf:logging />
 		</jaxrs:features>
 	</jaxrs:server>
 </beans>

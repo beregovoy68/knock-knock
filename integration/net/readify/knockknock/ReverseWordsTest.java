@@ -45,7 +45,7 @@ public class ReverseWordsTest extends AbstractWebServiceTest {
 			result = result.param("sentence", parameterValue);
 		
 		return result.when()
-				.get("/ReverseWords")
+				.get("/reversewords")
 			.then();
 	}
 }

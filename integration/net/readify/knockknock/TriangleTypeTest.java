@@ -92,7 +92,7 @@ public class TriangleTypeTest extends AbstractWebServiceTest {
 		result = addParameter(result, "c", lengthC);
 		
 		return result.when()
-				.get("/TriangleType")
+				.get("/triangletype")
 			.then();
 	}
 	

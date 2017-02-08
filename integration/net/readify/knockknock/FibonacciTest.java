@@ -1,7 +1,6 @@
 package net.readify.knockknock;
 
 import static org.hamcrest.Matchers.equalTo;
-import static org.junit.Assert.*;
 
 import org.junit.Test;
 
@@ -61,7 +60,7 @@ public class FibonacciTest extends AbstractWebServiceTest {
 			result = result.param("n", parameterValue);
 		
 		return result.when()
-				.get("/Fibonacci")
+				.get("/fibonacci")
 			.then();
 	}
 }
